@@ -121,6 +121,11 @@ func (c *Cache) key(r *http.Request) (string, error) {
 }
 
 func (c *Cache) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	if req.Method == http.MethodGet && len(req.Header.Get("Upgrade")) > 0 {
+		c.next.ServeHTTP(rw, req)
+		return
+	}
+
 	requestID := req.Header.Get(X_REQUEST_ID_HEADER)
 
 	key, err := c.key(req)
